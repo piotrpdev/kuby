@@ -11,8 +11,11 @@ repositories {
 }
 
 dependencies {
+    implementation("io.github.microutils:kotlin-logging:3.0.5")
+    implementation("org.slf4j:slf4j-simple:2.0.5")
     testImplementation(kotlin("test"))
     implementation("io.kubernetes:client-java:18.0.0")
+    implementation("com.jakewharton.picnic:picnic:0.6.0")
 }
 
 tasks.test {
