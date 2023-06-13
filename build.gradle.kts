@@ -29,3 +29,19 @@ kotlin {
 application {
     mainClass.set("MainKt")
 }
+
+tasks.jar {
+    manifest.attributes["Main-Class"] = "MainKt"
+    // for building a fat jar - include all dependencies
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    from(sourceSets.main.get().output)
+    dependsOn(configurations.runtimeClasspath)
+    from({
+        configurations.runtimeClasspath.get().filter { it.name.endsWith("jar") }.map { zipTree(it) }
+    }) {
+        // https://stackoverflow.com/questions/999489/invalid-signature-file-when-attempting-to-run-a-jar
+        exclude("META-INF/*.SF")
+        exclude("META-INF/*.DSA")
+        exclude("META-INF/*.RSA")
+    }
+}
