@@ -1,4 +1,4 @@
-![Example](./.github/img/carbon.png)
+![Example](./.github/img/example.webm)
 
 # Kuby
 
