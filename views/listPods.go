@@ -16,11 +16,6 @@ func (m ListPodsModel) Init() tea.Cmd { return nil }
 func (m ListPodsModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 
-	if m.Altscreen {
-		cmd = tea.ExitAltScreen
-		m.Altscreen = false
-	}
-
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
@@ -30,12 +25,10 @@ func (m ListPodsModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			} else {
 				m.Table.Focus()
 			}
-		case "q", "ctrl+c":
-			return m, tea.Quit
 		case "enter":
-			return m, tea.Batch(
-				tea.Printf("Let's go to %s!", m.Table.SelectedRow()[1]),
-			)
+			//return m, tea.Batch(
+			//	tea.Printf("Let's go to %s!", m.Table.SelectedRow()[1]),
+			//)
 		}
 	}
 	m.Table, cmd = m.Table.Update(msg)
@@ -43,5 +36,5 @@ func (m ListPodsModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m ListPodsModel) View() string {
-	return utils.BaseStyle.Render(m.Table.View()) + "\n" + utils.Subtle("up/down: select") + utils.Dot + utils.Subtle("enter: choose") + utils.Dot + utils.Subtle("q, ctrl+c: quit") + "\n"
+	return utils.BaseStyle.Render(m.Table.View()) + "\n" + utils.Subtle("up/down: select") + utils.Dot + utils.Subtle("enter: choose") + utils.Dot + utils.Subtle("q: go back") + "\n"
 }

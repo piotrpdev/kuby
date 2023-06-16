@@ -8,81 +8,63 @@ import (
 	"kuby/utils"
 )
 
+// Update loop for the first view where you're choosing a task.
+func updateChoices(msg tea.Msg, m MainMenuModel) (tea.Model, tea.Cmd) {
+	switch msg := msg.(type) {
+	case tea.KeyMsg:
+		switch msg.String() {
+		case "enter":
+			if msg.String() == "enter" {
+				if i, ok := m.List.SelectedItem().(MainMenuItem); ok {
+					m.Chosen = true
+					m.Choice = i.GetModel()
+					return m, m.Choice.Init()
+					//fmt.Println(i.Title())
+				}
+			}
+		case "q":
+			return m, tea.Quit
+		}
+	}
+
+	return m, nil
+}
+
+// Update loop for the second view after a choice has been made
+func updateChosen(msg tea.Msg, m MainMenuModel) (tea.Model, tea.Cmd) {
+	switch msg := msg.(type) {
+	case tea.KeyMsg:
+		if msg.String() == "q" {
+			m.Chosen = false
+			return m, nil
+		}
+	}
+
+	var cmd tea.Cmd
+	m.Choice, cmd = m.Choice.Update(msg)
+
+	return m, cmd
+}
+
 var docStyle = lipgloss.NewStyle().Margin(1, 2)
 
 type MainMenuItem struct {
 	TitleString, DescString string
+	GetModel                func() tea.Model
 }
 
 func (i MainMenuItem) Title() string       { return i.TitleString }
 func (i MainMenuItem) Description() string { return i.DescString }
 func (i MainMenuItem) FilterValue() string { return i.TitleString }
 
-func NewItemDelegate(keys *DelegateKeyMap) list.DefaultDelegate {
-	d := list.NewDefaultDelegate()
-
-	d.UpdateFunc = func(msg tea.Msg, m *list.Model) tea.Cmd {
-		switch msg := msg.(type) {
-		case tea.KeyMsg:
-			switch {
-			case key.Matches(msg, keys.choose):
-				return m.NewStatusMessage(utils.StatusMessageStyle("You chose"))
-			}
-		}
-
-		return nil
-	}
-
-	help := []key.Binding{keys.choose}
-
-	d.ShortHelpFunc = func() []key.Binding {
-		return help
-	}
-
-	d.FullHelpFunc = func() [][]key.Binding {
-		return [][]key.Binding{help}
-	}
-
-	return d
-}
-
-type DelegateKeyMap struct {
-	choose key.Binding
-}
-
-// ShortHelp Additional short help entries. This satisfies the help.KeyMap interface and
-// is entirely optional.
-func (d DelegateKeyMap) ShortHelp() []key.Binding {
-	return []key.Binding{
-		d.choose,
-	}
-}
-
-// FullHelp Additional full help entries. This satisfies the help.KeyMap interface and
-// is entirely optional.
-func (d DelegateKeyMap) FullHelp() [][]key.Binding {
-	return [][]key.Binding{
-		{
-			d.choose,
-		},
-	}
-}
-
-func NewDelegateKeyMap() *DelegateKeyMap {
-	return &DelegateKeyMap{
-		choose: key.NewBinding(
-			key.WithKeys("enter"),
-			key.WithHelp("enter", "choose"),
-		),
-	}
-}
-
 type MainMenuModel struct {
-	List         list.Model
-	DelegateKeys *DelegateKeyMap
+	List   list.Model
+	Choice tea.Model
+	Chosen bool
 }
 
 func (m MainMenuModel) Init() tea.Cmd {
+	// TODO: Check if this causes issues
 	return tea.EnterAltScreen
 }
 
@@ -97,27 +79,44 @@ func (m MainMenuModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.List.SetSize(msg.Width-h, msg.Height-v)
 	}
 
-	var cmd tea.Cmd
-
-	m.List, cmd = m.List.Update(msg)
-	return m, cmd
+	// Hand off the message and model to the appropriate update function for the
+	// appropriate view based on the current state.
+	if !m.Chosen {
+		m.List, _ = m.List.Update(msg)
+		return updateChoices(msg, m)
+	} else {
+		return updateChosen(msg, m)
+	}
 }
 
 func (m MainMenuModel) View() string {
-	return docStyle.Render(m.List.View())
+	var s string
+
+	if !m.Chosen {
+		s = docStyle.Render(m.List.View())
+	} else {
+		s = m.Choice.View()
+	}
+
+	return s
 }
 
 func NewMainMenuModel(items *[]list.Item) MainMenuModel {
-	var delegateKeys = NewDelegateKeyMap()
+	delegateKeys := utils.DelegateKeyMap{KeyBindings: []key.Binding{
+		key.NewBinding(
+			key.WithKeys("enter"),
+			key.WithHelp("enter", "choose"),
+		),
+	}}
 
 	// Setup list
-	delegate := NewItemDelegate(delegateKeys)
+	delegate := utils.NewItemDelegate(&delegateKeys)
 	mainMenuList := list.New(*items, delegate, 0, 0)
 	mainMenuList.Title = "Main Menu"
 	mainMenuList.Styles.Title = utils.TitleStyle
 
 	return MainMenuModel{
-		List:         mainMenuList,
-		DelegateKeys: delegateKeys,
+		List:   mainMenuList,
+		Chosen: false,
 	}
 }
