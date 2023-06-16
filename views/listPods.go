@@ -3,16 +3,24 @@ package views
 import (
 	"github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"
+	"kuby/utils"
 )
 
 type ListPodsModel struct {
-	Table table.Model
+	Table     table.Model
+	Altscreen bool
 }
 
 func (m ListPodsModel) Init() tea.Cmd { return nil }
 
 func (m ListPodsModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
+
+	if m.Altscreen {
+		cmd = tea.ExitAltScreen
+		m.Altscreen = false
+	}
+
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
@@ -35,5 +43,5 @@ func (m ListPodsModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m ListPodsModel) View() string {
-	return baseStyle.Render(m.Table.View()) + "\n" + subtle("up/down: select") + dot + subtle("enter: choose") + dot + subtle("q, ctrl+c: quit") + "\n"
+	return utils.BaseStyle.Render(m.Table.View()) + "\n" + utils.Subtle("up/down: select") + utils.Dot + utils.Subtle("enter: choose") + utils.Dot + utils.Subtle("q, ctrl+c: quit") + "\n"
 }
