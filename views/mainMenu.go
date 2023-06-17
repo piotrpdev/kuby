@@ -4,7 +4,9 @@ import (
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/common-nighthawk/go-figure"
 	"kuby/utils"
+	"strings"
 )
 
 // Update loop for the first view where you're choosing a task.
@@ -125,7 +127,9 @@ func NewMainMenuModel(items *[]list.Item) MainMenuModel {
 	// Setup list
 	delegate := utils.NewItemDelegate(&delegateKeys)
 	mainMenuList := list.New(*items, delegate, 0, 0)
-	mainMenuList.Title = "Main Menu"
+	logo := figure.NewFigure("Kuby", "", true)
+	longLogo := strings.Join(logo.Slicify(), "\n")
+	mainMenuList.Title = longLogo
 	mainMenuList.Styles.Title = utils.TitleStyle
 
 	return MainMenuModel{

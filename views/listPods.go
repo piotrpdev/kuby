@@ -1,8 +1,12 @@
 package views
 
 import (
+	"context"
 	"github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"
+	"gopkg.in/yaml.v3"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"kuby/k8s"
 	"kuby/utils"
 )
 
@@ -31,7 +35,20 @@ func (m ListPodsModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, utils.BackToMainMenu
 		case "enter":
 			selectedRow := m.Table.SelectedRow()
-			newModel := NewInspectJsonModel(m.Height, m.Width, selectedRow[1], selectedRow[2])
+
+			clientset := k8s.GetClientset()
+			pod, err := clientset.CoreV1().Pods(selectedRow[2]).Get(context.TODO(), selectedRow[1], metav1.GetOptions{})
+			if err != nil {
+				panic(err)
+			}
+
+			pod.ObjectMeta.SetManagedFields(nil) // Really large and causes issues, not included in `kubectl get pods -o json` anyway
+
+			metadataJson, _ := yaml.Marshal(pod.ObjectMeta)
+			specJson, _ := yaml.Marshal(pod.Spec)
+			statusJson, _ := yaml.Marshal(pod.Status)
+
+			newModel := NewInspectJsonModel(m.Height, m.Width, string(metadataJson), string(specJson), string(statusJson))
 			return m, utils.CreateChangeModel(&newModel, &m)
 		}
 	}

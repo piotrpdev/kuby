@@ -1,15 +1,11 @@
 package views
 
 import (
-	"context"
 	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/textarea"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-	"gopkg.in/yaml.v3"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"kuby/k8s"
 	"kuby/utils"
 )
 
@@ -79,7 +75,7 @@ type InspectJsonModel struct {
 	focus  int
 }
 
-func NewInspectJsonModel(newHeight int, newWidth int, podName string, podNamespace string) InspectJsonModel {
+func NewInspectJsonModel(newHeight int, newWidth int, metadata string, spec string, status string) InspectJsonModel {
 	m := InspectJsonModel{
 		//inputs: make([]textarea.Model, initialInputs),
 		inputs: make([]textarea.Model, 3),
@@ -112,13 +108,6 @@ func NewInspectJsonModel(newHeight int, newWidth int, podName string, podNamespa
 	//for i := 0; i < initialInputs; i++ {
 	//	m.inputs[i] = newTextarea()
 	//}
-	clientset := k8s.GetClientset()
-	pod, err := clientset.CoreV1().Pods(podNamespace).Get(context.TODO(), podName, metav1.GetOptions{})
-	if err != nil {
-		panic(err)
-	}
-
-	pod.ObjectMeta.SetManagedFields(nil) // Really large and causes issues, not included in `kubectl get pods -o json` anyway
 
 	//metadataJson, _ := json.MarshalIndent(pod.ObjectMeta, "", "    ")
 	//specJson, _ := json.MarshalIndent(pod.Spec, "", "    ")
@@ -128,13 +117,17 @@ func NewInspectJsonModel(newHeight int, newWidth int, podName string, podNamespa
 	//m.inputs[1] = newTextarea(string(specJson))     // spec
 	//m.inputs[2] = newTextarea(string(statusJson))   // status
 
-	metadataJson, _ := yaml.Marshal(pod.ObjectMeta)
-	specJson, _ := yaml.Marshal(pod.Spec)
-	statusJson, _ := yaml.Marshal(pod.Status)
+	//metadataJson, _ := yaml.Marshal(pod.ObjectMeta)
+	//specJson, _ := yaml.Marshal(pod.Spec)
+	//statusJson, _ := yaml.Marshal(pod.Status)
+	//
+	//m.inputs[0] = newTextarea(string(metadataJson)) // metadata
+	//m.inputs[1] = newTextarea(string(specJson))     // spec
+	//m.inputs[2] = newTextarea(string(statusJson))   // status
 
-	m.inputs[0] = newTextarea(string(metadataJson)) // metadata
-	m.inputs[1] = newTextarea(string(specJson))     // spec
-	m.inputs[2] = newTextarea(string(statusJson))   // status
+	m.inputs[0] = newTextarea(metadata) // metadata
+	m.inputs[1] = newTextarea(spec)     // spec
+	m.inputs[2] = newTextarea(status)   // status
 
 	m.inputs[m.focus].Focus()
 	updateKeybindings(&m)
