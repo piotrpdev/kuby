@@ -1,6 +1,7 @@
 package views
 
 import (
+	"errors"
 	"github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"
 	"kuby/utils"
@@ -25,10 +26,10 @@ func (m ListPodsModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			} else {
 				m.Table.Focus()
 			}
+		case "q":
+			return m, utils.BackToMainMenu
 		case "enter":
-			//return m, tea.Batch(
-			//	tea.Printf("Let's go to %s!", m.Table.SelectedRow()[1]),
-			//)
+			return m, utils.CreateChangeModel(ConnectErrorModel{Error: errors.New("hello there")})
 		}
 	}
 	m.Table, cmd = m.Table.Update(msg)

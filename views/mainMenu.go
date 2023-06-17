@@ -13,13 +13,11 @@ func updateChoices(msg tea.Msg, m MainMenuModel) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "enter":
-			if msg.String() == "enter" {
-				if i, ok := m.List.SelectedItem().(MainMenuItem); ok {
-					m.Chosen = true
-					m.Choice = i.GetModel()
-					return m, m.Choice.Init()
-					//fmt.Println(i.Title())
-				}
+			if i, ok := m.List.SelectedItem().(MainMenuItem); ok {
+				m.Chosen = true
+				m.Choice = i.GetModel()
+				return m, m.Choice.Init()
+				//fmt.Println(i.Title())
 			}
 		case "q":
 			return m, tea.Quit
@@ -39,10 +37,16 @@ func updateChoices(msg tea.Msg, m MainMenuModel) (tea.Model, tea.Cmd) {
 func updateChosen(msg tea.Msg, m MainMenuModel) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
-		if msg.String() == "q" {
-			m.Chosen = false
-			return m, nil
-		}
+	//if msg.String() == "q" {
+	//	m.Chosen = false
+	//	return m, nil
+	//}
+	case utils.BackToMainMenuMsg:
+		m.Chosen = false
+		return m, nil
+	case utils.ChangeModelMsg:
+		m.Choice = msg
+		return m, m.Choice.Init()
 	}
 
 	var cmd tea.Cmd
@@ -67,8 +71,7 @@ type MainMenuModel struct {
 }
 
 func (m MainMenuModel) Init() tea.Cmd {
-	// TODO: Check if this causes issues
-	return tea.EnterAltScreen
+	return nil
 }
 
 func (m MainMenuModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {

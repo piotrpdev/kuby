@@ -25,6 +25,8 @@ func (m ListEndpointsModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			} else {
 				m.Table.Focus()
 			}
+		case "q":
+			return m, utils.BackToMainMenu
 		case "enter":
 			//return m, tea.Batch(
 			//	tea.Printf("Let's go to %s!", m.Table.SelectedRow()[1]),
