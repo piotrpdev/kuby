@@ -4,7 +4,6 @@ import (
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/lipgloss"
 	"kuby/utils"
 )
 
@@ -46,8 +45,6 @@ func updateChosen(msg tea.Msg, m MainMenuModel) (tea.Model, tea.Cmd) {
 	return m, cmd
 }
 
-var docStyle = lipgloss.NewStyle().Margin(1, 2)
-
 type MainMenuItem struct {
 	TitleString, DescString string
 	GetModel                func() tea.Model
@@ -75,7 +72,7 @@ func (m MainMenuModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, tea.Quit
 		}
 	case tea.WindowSizeMsg:
-		h, v := docStyle.GetFrameSize()
+		h, v := utils.AppStyle.GetFrameSize()
 		m.List.SetSize(msg.Width-h, msg.Height-v)
 	}
 
@@ -93,7 +90,7 @@ func (m MainMenuModel) View() string {
 	var s string
 
 	if !m.Chosen {
-		s = docStyle.Render(m.List.View())
+		s = utils.AppStyle.Render(m.List.View())
 	} else {
 		s = m.Choice.View()
 	}

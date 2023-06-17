@@ -22,7 +22,7 @@ var BaseStyle = lipgloss.NewStyle().
 	BorderForeground(lipgloss.Color("240"))
 
 var (
-	appStyle = lipgloss.NewStyle().Padding(1, 2)
+	AppStyle = lipgloss.NewStyle().Margin(1, 2)
 
 	TitleStyle = lipgloss.NewStyle().
 			Foreground(lipgloss.Color("#FFFDF5")).
