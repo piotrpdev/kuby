@@ -41,7 +41,7 @@ var (
 )
 
 type keymap = struct {
-	next, prev, add, remove, quit key.Binding
+	next, prev, add, remove, moveToBegin, quit key.Binding
 }
 
 func newTextarea(textValue string) textarea.Model {
@@ -93,6 +93,10 @@ func NewInspectJsonModel(newHeight int, newWidth int, metadata string, spec stri
 			//	key.WithKeys("ctrl+n"),
 			//	key.WithHelp("ctrl+n", "add an editor"),
 			//),
+			moveToBegin: key.NewBinding(
+				key.WithKeys("ctrl+home"),
+				key.WithHelp("ctrl+home", "move cursor to top"),
+			),
 			remove: key.NewBinding(
 				key.WithKeys("ctrl+w"),
 				key.WithHelp("ctrl+w", "remove an editor"),
@@ -205,6 +209,7 @@ func (m InspectJsonModel) View() string {
 		m.keymap.next,
 		m.keymap.prev,
 		//m.keymap.add,
+		m.keymap.moveToBegin,
 		m.keymap.remove,
 		m.keymap.quit,
 	})
