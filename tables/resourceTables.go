@@ -39,7 +39,7 @@ func GetPodsTable(clientset *kubernetes.Clientset) (*table.Model, error) {
 		table.WithColumns(columns),
 		table.WithRows(rows),
 		table.WithFocused(true),
-		table.WithHeight(7),
+		table.WithHeight(10),
 	)
 
 	s := table.DefaultStyles()

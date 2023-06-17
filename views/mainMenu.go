@@ -15,7 +15,7 @@ func updateChoices(msg tea.Msg, m MainMenuModel) (tea.Model, tea.Cmd) {
 		case "enter":
 			if i, ok := m.List.SelectedItem().(MainMenuItem); ok {
 				m.Chosen = true
-				m.Choice = i.GetModel()
+				m.Choice = i.GetModel(&m)
 				return m, m.Choice.Init()
 				//fmt.Println(i.Title())
 			}
@@ -67,7 +67,7 @@ func updateChosen(msg tea.Msg, m MainMenuModel) (tea.Model, tea.Cmd) {
 
 type MainMenuItem struct {
 	TitleString, DescString string
-	GetModel                func() tea.Model
+	GetModel                func(currentModel *MainMenuModel) tea.Model
 }
 
 func (i MainMenuItem) Title() string       { return i.TitleString }

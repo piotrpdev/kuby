@@ -6,6 +6,7 @@ require (
 	github.com/charmbracelet/bubbles v0.16.1
 	github.com/charmbracelet/bubbletea v0.24.2
 	github.com/charmbracelet/lipgloss v0.7.1
+	github.com/jmoiron/jsonq v0.0.0-20150511023944-e874b168d07e
 	github.com/muesli/termenv v0.15.1
 	github.com/samber/lo v1.38.1
 	k8s.io/api v0.27.2

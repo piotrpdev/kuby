@@ -1,7 +1,6 @@
 package views
 
 import (
-	"errors"
 	"github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"
 	"kuby/utils"
@@ -10,6 +9,8 @@ import (
 type ListPodsModel struct {
 	Table     table.Model
 	Altscreen bool
+	Height    int
+	Width     int
 }
 
 func (m ListPodsModel) Init() tea.Cmd { return nil }
@@ -29,7 +30,8 @@ func (m ListPodsModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "q":
 			return m, utils.BackToMainMenu
 		case "enter":
-			newModel := ConnectErrorModel{Error: errors.New("hello there")}
+			selectedRow := m.Table.SelectedRow()
+			newModel := NewInspectJsonModel(m.Height, m.Width, selectedRow[1], selectedRow[2])
 			return m, utils.CreateChangeModel(&newModel, &m)
 		}
 	}

@@ -8,9 +8,9 @@ import (
 )
 
 var (
-	color   = termenv.EnvColorProfile().Color
-	keyword = termenv.Style{}.Foreground(color("204")).Background(color("235")).Styled
-	help    = termenv.Style{}.Foreground(color("241")).Styled
+	color     = termenv.EnvColorProfile().Color
+	keyword   = termenv.Style{}.Foreground(color("204")).Background(color("235")).Styled
+	helpStyle = termenv.Style{}.Foreground(color("241")).Styled
 )
 
 type ConnectErrorModel struct {
@@ -34,5 +34,5 @@ func (m ConnectErrorModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m ConnectErrorModel) View() string {
-	return utils.AppStyle.Render(fmt.Sprint(keyword(m.Error.Error()), "\n\n", "Is Docker/K8s running?", "\n\n\n", help("space: switch modes • q: go back\n")))
+	return utils.AppStyle.Render(fmt.Sprint(keyword(m.Error.Error()), "\n\n", "Is Docker/K8s running?", "\n\n\n", helpStyle("space: switch modes • q: go back\n")))
 }
