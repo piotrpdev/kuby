@@ -21,7 +21,7 @@ func (m ConnectErrorModel) Init() tea.Cmd {
 	return nil
 }
 
-func (m ConnectErrorModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m ConnectErrorModel) Update(_ tea.Msg) (tea.Model, tea.Cmd) {
 	return m, nil
 }
 

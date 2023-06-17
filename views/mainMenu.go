@@ -24,9 +24,15 @@ func updateChoices(msg tea.Msg, m MainMenuModel) (tea.Model, tea.Cmd) {
 		case "q":
 			return m, tea.Quit
 		}
+	case tea.WindowSizeMsg:
+		h, v := utils.AppStyle.GetFrameSize()
+		m.List.SetSize(msg.Width-h, msg.Height-v)
 	}
 
-	return m, nil
+	var cmd tea.Cmd
+	m.List, cmd = m.List.Update(msg)
+
+	return m, cmd
 }
 
 // Update loop for the second view after a choice has been made
@@ -71,15 +77,11 @@ func (m MainMenuModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		if msg.String() == "ctrl+c" {
 			return m, tea.Quit
 		}
-	case tea.WindowSizeMsg:
-		h, v := utils.AppStyle.GetFrameSize()
-		m.List.SetSize(msg.Width-h, msg.Height-v)
 	}
 
 	// Hand off the message and model to the appropriate update function for the
 	// appropriate view based on the current state.
 	if !m.Chosen {
-		m.List, _ = m.List.Update(msg)
 		return updateChoices(msg, m)
 	} else {
 		return updateChosen(msg, m)
@@ -90,12 +92,12 @@ func (m MainMenuModel) View() string {
 	var s string
 
 	if !m.Chosen {
-		s = utils.AppStyle.Render(m.List.View())
+		s = m.List.View()
 	} else {
 		s = m.Choice.View()
 	}
 
-	return s
+	return utils.AppStyle.Render(s)
 }
 
 func NewMainMenuModel(items *[]list.Item) MainMenuModel {
