@@ -41,11 +41,21 @@ func updateChosen(msg tea.Msg, m MainMenuModel) (tea.Model, tea.Cmd) {
 	//	m.Chosen = false
 	//	return m, nil
 	//}
+	case utils.BackInHistoryMsg:
+		if len(m.ViewHistory) == 0 {
+			m.Chosen = false
+			return m, nil
+		}
+		m.Choice = *m.ViewHistory[len(m.ViewHistory)-1]
+		m.ViewHistory = m.ViewHistory[:len(m.ViewHistory)-1]
+		return m, nil
 	case utils.BackToMainMenuMsg:
 		m.Chosen = false
+		m.ViewHistory = []*tea.Model{}
 		return m, nil
 	case utils.ChangeModelMsg:
-		m.Choice = msg
+		m.ViewHistory = append(m.ViewHistory, msg.CurrentModel)
+		m.Choice = *msg.NewModel
 		return m, m.Choice.Init()
 	}
 
@@ -65,9 +75,10 @@ func (i MainMenuItem) Description() string { return i.DescString }
 func (i MainMenuItem) FilterValue() string { return i.TitleString }
 
 type MainMenuModel struct {
-	List   list.Model
-	Choice tea.Model
-	Chosen bool
+	List        list.Model
+	Choice      tea.Model
+	Chosen      bool
+	ViewHistory []*tea.Model
 }
 
 func (m MainMenuModel) Init() tea.Cmd {
@@ -118,7 +129,9 @@ func NewMainMenuModel(items *[]list.Item) MainMenuModel {
 	mainMenuList.Styles.Title = utils.TitleStyle
 
 	return MainMenuModel{
-		List:   mainMenuList,
-		Chosen: false,
+		List:        mainMenuList,
+		Choice:      nil,
+		Chosen:      false,
+		ViewHistory: []*tea.Model{},
 	}
 }

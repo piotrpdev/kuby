@@ -29,7 +29,8 @@ func (m ListPodsModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "q":
 			return m, utils.BackToMainMenu
 		case "enter":
-			return m, utils.CreateChangeModel(ConnectErrorModel{Error: errors.New("hello there")})
+			newModel := ConnectErrorModel{Error: errors.New("hello there")}
+			return m, utils.CreateChangeModel(&newModel, &m)
 		}
 	}
 	m.Table, cmd = m.Table.Update(msg)

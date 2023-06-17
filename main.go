@@ -13,10 +13,12 @@ import (
 func main() {
 	clientset := k8s.GetClientset()
 
+	// TODO: Maybe use a custom type for top-level views to force them to use `utils.BackToMainMenu`
 	items := []list.Item{
 		views.MainMenuItem{TitleString: "List Pods", DescString: "The smallest and simplest Kubernetes object.", GetModel: func() tea.Model {
 			podsTable, err := tables.GetPodsTable(clientset)
 			if err != nil {
+				// TODO: Test this works with the new router/history system
 				return views.ConnectErrorModel{Error: err}
 			}
 

@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 )
 
+// GetClientset Use singleton for this
 func GetClientset() *kubernetes.Clientset {
 	var kubeconfig *string
 	if home := homedir.HomeDir(); home != "" {

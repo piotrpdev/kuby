@@ -2,11 +2,14 @@ package utils
 
 import tea "github.com/charmbracelet/bubbletea"
 
-type ChangeModelMsg tea.Model
+type ChangeModelMsg struct {
+	NewModel     *tea.Model
+	CurrentModel *tea.Model
+}
 
-func CreateChangeModel(model tea.Model) func() tea.Msg {
+func CreateChangeModel(newModel tea.Model, currentModel tea.Model) func() tea.Msg {
 	return func() tea.Msg {
-		return ChangeModelMsg(model)
+		return ChangeModelMsg{NewModel: &newModel, CurrentModel: &currentModel}
 	}
 }
 
@@ -14,4 +17,10 @@ type BackToMainMenuMsg struct{}
 
 func BackToMainMenu() tea.Msg {
 	return BackToMainMenuMsg{}
+}
+
+type BackInHistoryMsg struct{}
+
+func BackInHistory() tea.Msg {
+	return BackInHistoryMsg{}
 }

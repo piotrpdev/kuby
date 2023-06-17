@@ -21,7 +21,15 @@ func (m ConnectErrorModel) Init() tea.Cmd {
 	return nil
 }
 
-func (m ConnectErrorModel) Update(_ tea.Msg) (tea.Model, tea.Cmd) {
+func (m ConnectErrorModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	switch msg := msg.(type) {
+	case tea.KeyMsg:
+		switch msg.String() {
+		case "q":
+			return m, utils.BackInHistory
+		}
+	}
+
 	return m, nil
 }
 
