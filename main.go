@@ -2,10 +2,10 @@ package main
 
 import (
 	"fmt"
+	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
 	"kuby/k8s"
-	"kuby/tables"
 	"kuby/views"
 	"os"
 )
@@ -16,29 +16,29 @@ func main() {
 	// TODO: Maybe use a custom type for top-level views to force them to use `utils.BackToMainMenu`
 	items := []list.Item{
 		views.MainMenuItem{TitleString: "List Pods", DescString: "The smallest and simplest Kubernetes object.", GetModel: func(m *views.MainMenuModel) tea.Model {
-			podsTable, err := tables.GetPodsTable(clientset)
+			podsTable, err := views.NewPodsTable(clientset)
 			if err != nil {
 				// TODO: Test this works with the new router/history system
 				return views.ConnectErrorModel{Error: err}
 			}
 
-			return views.ListPodsModel{Table: *podsTable, Altscreen: true, Height: m.List.Height(), Width: m.List.Width()}
+			return views.ListPodsModel{Table: *podsTable, Help: help.New(), Altscreen: true, Height: m.List.Height(), Width: m.List.Width()}
 		}},
 		views.MainMenuItem{TitleString: "List Services", DescString: "A method for exposing a network application that is running as one or more Pods in your cluster.", GetModel: func(m *views.MainMenuModel) tea.Model {
-			servicesTable, err := tables.GetServicesTable(clientset)
+			servicesTable, err := views.NewServicesTable(clientset)
 			if err != nil {
 				return views.ConnectErrorModel{Error: err}
 			}
 
-			return views.ListServicesModel{Table: *servicesTable, Altscreen: true, Height: m.List.Height(), Width: m.List.Width()}
+			return views.ListServicesModel{Table: *servicesTable, Help: help.New(), Altscreen: true, Height: m.List.Height(), Width: m.List.Width()}
 		}},
 		views.MainMenuItem{TitleString: "List Endpoints", DescString: "Network endpoint, typically referenced by a Service to define which Pods the traffic can be sent to.", GetModel: func(m *views.MainMenuModel) tea.Model {
-			endpointsTable, err := tables.GetEndpointsTable(clientset)
+			endpointsTable, err := views.NewEndpointsTable(clientset)
 			if err != nil {
 				return views.ConnectErrorModel{Error: err}
 			}
 
-			return views.ListEndpointsModel{Table: *endpointsTable, Altscreen: true, Height: m.List.Height(), Width: m.List.Width()}
+			return views.ListEndpointsModel{Table: *endpointsTable, Help: help.New(), Altscreen: true, Height: m.List.Height(), Width: m.List.Width()}
 		}},
 	}
 
