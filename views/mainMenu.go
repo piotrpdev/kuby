@@ -117,7 +117,7 @@ func (m MainMenuModel) View() string {
 }
 
 func NewMainMenuModel(items *[]list.Item) MainMenuModel {
-	delegateKeys := utils.DelegateKeyMap{KeyBindings: []key.Binding{
+	delegateKeys := utils.SliceKeyMap{KeyBindings: []key.Binding{
 		key.NewBinding(
 			key.WithKeys("enter"),
 			key.WithHelp("enter", "choose"),
@@ -125,7 +125,7 @@ func NewMainMenuModel(items *[]list.Item) MainMenuModel {
 	}}
 
 	// Setup list
-	delegate := utils.NewItemDelegate(&delegateKeys)
+	delegate := utils.NewDefaultListDelegate(&delegateKeys)
 	mainMenuList := list.New(*items, delegate, 0, 0)
 	logo := figure.NewFigure("Kuby", "", true)
 	longLogo := strings.Join(logo.Slicify(), "\n")
