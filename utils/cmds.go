@@ -24,3 +24,12 @@ type BackInHistoryMsg struct{}
 func BackInHistory() tea.Msg {
 	return BackInHistoryMsg{}
 }
+
+func WindowSizeCmd(Width int, Height int) tea.Cmd {
+	return func() tea.Msg {
+		return tea.WindowSizeMsg{
+			Width:  Width,
+			Height: Height,
+		}
+	}
+}
