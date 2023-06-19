@@ -5,11 +5,11 @@ import (
 	"github.com/charmbracelet/bubbles/list"
 )
 
-type DelegateKeyMap struct {
+type SliceKeyMap struct {
 	KeyBindings []key.Binding
 }
 
-func NewItemDelegate(keys *DelegateKeyMap) list.DefaultDelegate {
+func NewDefaultListDelegate(keys *SliceKeyMap) list.DefaultDelegate {
 	d := list.NewDefaultDelegate()
 
 	d.ShortHelpFunc = func() []key.Binding {
