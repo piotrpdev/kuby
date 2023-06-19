@@ -177,6 +177,9 @@ func (m InspectJsonModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.focus = len(m.inputs) - 1
 			}
 		}
+	case tea.WindowSizeMsg:
+		m.height = msg.Height
+		m.width = msg.Width
 	}
 
 	updateKeybindings(&m)
