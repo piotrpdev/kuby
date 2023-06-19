@@ -9,6 +9,7 @@ import (
 	"github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/samber/lo"
 	lop "github.com/samber/lo/parallel"
 	"gopkg.in/yaml.v3"
 	v1 "k8s.io/api/core/v1"
@@ -72,7 +73,7 @@ func (m ListServicesModel) View() string {
 
 	b.WriteString(tableView)
 
-	fmt.Fprint(&b, strings.Repeat("\n", m.Height-lipgloss.Height(tableView)-lipgloss.Height(helpView)+1))
+	fmt.Fprint(&b, strings.Repeat("\n", lo.Max([]int{m.Height - lipgloss.Height(tableView) - lipgloss.Height(helpView) + 1, 0})))
 
 	b.WriteString(helpView)
 
@@ -105,7 +106,7 @@ func NewServicesTable(clientset *kubernetes.Clientset) (*table.Model, error) {
 		table.WithColumns(columns),
 		table.WithRows(rows),
 		table.WithFocused(true),
-		table.WithHeight(7),
+		table.WithHeight(lo.Clamp(len(rows), 5, 30)),
 	)
 
 	s := table.DefaultStyles()

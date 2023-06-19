@@ -71,7 +71,7 @@ func (m ListEndpointsModel) View() string {
 
 	b.WriteString(tableView)
 
-	fmt.Fprint(&b, strings.Repeat("\n", m.Height-lipgloss.Height(tableView)-lipgloss.Height(helpView)+1))
+	fmt.Fprint(&b, strings.Repeat("\n", lo.Max([]int{m.Height - lipgloss.Height(tableView) - lipgloss.Height(helpView) + 1, 0})))
 
 	b.WriteString(helpView)
 
@@ -103,7 +103,7 @@ func NewEndpointsTable(clientset *kubernetes.Clientset) (*table.Model, error) {
 		{Title: "Index", Width: 5},
 		{Title: "Name", Width: tables.LongestInColumn(&rows, 1)},
 		{Title: "Namespace", Width: tables.LongestInColumn(&rows, 2)},
-		{Title: "Adresses", Width: tables.LongestInColumn(&rows, 3)},
+		{Title: "Addresses", Width: tables.LongestInColumn(&rows, 3)},
 		{Title: "Ports", Width: tables.LongestInColumn(&rows, 4)},
 	}
 
@@ -111,7 +111,7 @@ func NewEndpointsTable(clientset *kubernetes.Clientset) (*table.Model, error) {
 		table.WithColumns(columns),
 		table.WithRows(rows),
 		table.WithFocused(true),
-		table.WithHeight(7),
+		table.WithHeight(lo.Clamp(len(rows), 5, 30)),
 	)
 
 	s := table.DefaultStyles()
