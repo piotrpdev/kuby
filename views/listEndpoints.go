@@ -14,7 +14,6 @@ import (
 	"gopkg.in/yaml.v3"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/client-go/kubernetes"
 	"kuby/k8s"
 	"kuby/tables"
 	"kuby/utils"
@@ -78,14 +77,8 @@ func (m ListEndpointsModel) View() string {
 	return b.String()
 }
 
-func NewEndpointsTable(clientset *kubernetes.Clientset) (*table.Model, error) {
-	// TODO: Maybe move the api call somewhere else and add endpoints as param e.g. separate concerns
-	endpoints, err := clientset.CoreV1().Endpoints("").List(context.TODO(), metav1.ListOptions{})
-	if err != nil {
-		return nil, err
-	}
-
-	rows := lop.Map(endpoints.Items, func(item v1.Endpoints, index int) table.Row {
+func EndpointsListToRows(endpoints *v1.EndpointsList) []table.Row {
+	return lop.Map(endpoints.Items, func(item v1.Endpoints, index int) table.Row {
 		addresses := lo.FlatMap(item.Subsets, func(item v1.EndpointSubset, _ int) []string {
 			return lop.Map(item.Addresses, func(item v1.EndpointAddress, _ int) string {
 				return item.IP
@@ -98,7 +91,9 @@ func NewEndpointsTable(clientset *kubernetes.Clientset) (*table.Model, error) {
 		})
 		return table.Row{strconv.Itoa(index), item.ObjectMeta.Name, item.ObjectMeta.Namespace, strings.Join(addresses, ", "), strings.Join(ports, ", ")}
 	})
+}
 
+func NewEndpointsTable(rows []table.Row) *table.Model {
 	columns := []table.Column{
 		{Title: "Index", Width: 5},
 		{Title: "Name", Width: tables.LongestInColumn(&rows, 1)},
@@ -126,5 +121,5 @@ func NewEndpointsTable(clientset *kubernetes.Clientset) (*table.Model, error) {
 		Bold(false)
 	t.SetStyles(s)
 
-	return &t, err
+	return &t
 }

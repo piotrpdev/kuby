@@ -11,32 +11,39 @@ import (
 )
 
 func main() {
-	clientset := k8s.GetClientset()
-
 	// TODO: Maybe use a custom type for top-level views to force them to use `utils.BackToMainMenu`
 	items := []list.Item{
 		views.MainMenuItem{TitleString: "List Pods", DescString: "The smallest and simplest Kubernetes object.", GetModel: func(m *views.MainMenuModel) tea.Model {
-			podsTable, err := views.NewPodsTable(clientset)
+			pods, err := k8s.GetAllPods()
 			if err != nil {
 				// TODO: Test this works with the new router/history system
 				return views.ConnectErrorModel{Error: err}
 			}
 
+			rows := views.PodListToRows(pods)
+			podsTable := views.NewPodsTable(rows)
+
 			return views.ListPodsModel{Table: *podsTable, Help: help.New(), Altscreen: true, Height: m.List.Height(), Width: m.List.Width()}
 		}},
 		views.MainMenuItem{TitleString: "List Services", DescString: "A method for exposing a network application that is running as one or more Pods in your cluster.", GetModel: func(m *views.MainMenuModel) tea.Model {
-			servicesTable, err := views.NewServicesTable(clientset)
+			services, err := k8s.GetAllServices()
 			if err != nil {
 				return views.ConnectErrorModel{Error: err}
 			}
 
+			rows := views.ServiceListToRows(services)
+			servicesTable := views.NewServicesTable(rows)
+
 			return views.ListServicesModel{Table: *servicesTable, Help: help.New(), Altscreen: true, Height: m.List.Height(), Width: m.List.Width()}
 		}},
 		views.MainMenuItem{TitleString: "List Endpoints", DescString: "Network endpoint, typically referenced by a Service to define which Pods the traffic can be sent to.", GetModel: func(m *views.MainMenuModel) tea.Model {
-			endpointsTable, err := views.NewEndpointsTable(clientset)
+			endpoints, err := k8s.GetAllEndpoints()
 			if err != nil {
 				return views.ConnectErrorModel{Error: err}
 			}
+
+			rows := views.EndpointsListToRows(endpoints)
+			endpointsTable := views.NewEndpointsTable(rows)
 
 			return views.ListEndpointsModel{Table: *endpointsTable, Help: help.New(), Altscreen: true, Height: m.List.Height(), Width: m.List.Width()}
 		}},

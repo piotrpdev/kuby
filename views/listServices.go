@@ -14,7 +14,6 @@ import (
 	"gopkg.in/yaml.v3"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/client-go/kubernetes"
 	"kuby/k8s"
 	"kuby/tables"
 	"kuby/utils"
@@ -80,20 +79,16 @@ func (m ListServicesModel) View() string {
 	return b.String()
 }
 
-func NewServicesTable(clientset *kubernetes.Clientset) (*table.Model, error) {
-	// TODO: Maybe move the api call somewhere else and add services as param e.g. separate concerns
-	services, err := clientset.CoreV1().Services("").List(context.TODO(), metav1.ListOptions{})
-	if err != nil {
-		return nil, err
-	}
-
-	rows := lop.Map(services.Items, func(item v1.Service, index int) table.Row {
+func ServiceListToRows(services *v1.ServiceList) []table.Row {
+	return lop.Map(services.Items, func(item v1.Service, index int) table.Row {
 		ports := lop.Map(item.Spec.Ports, func(item v1.ServicePort, _ int) string {
 			return strconv.Itoa(int(item.Port))
 		})
 		return table.Row{strconv.Itoa(index), item.ObjectMeta.Name, item.ObjectMeta.Namespace, item.Spec.ClusterIP, strings.Join(ports, ", ")}
 	})
+}
 
+func NewServicesTable(rows []table.Row) *table.Model {
 	columns := []table.Column{
 		{Title: "Index", Width: 5},
 		{Title: "Name", Width: tables.LongestInColumn(&rows, 1)},
@@ -121,5 +116,5 @@ func NewServicesTable(clientset *kubernetes.Clientset) (*table.Model, error) {
 		Bold(false)
 	t.SetStyles(s)
 
-	return &t, err
+	return &t
 }
