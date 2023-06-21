@@ -40,6 +40,9 @@ func main() {
 
 			return views.ListEndpointsModel{Table: *endpointsTable, Help: help.New(), Altscreen: true, Height: m.List.Height(), Width: m.List.Width()}
 		}},
+		views.MainMenuItem{TitleString: "View Code", DescString: "See the code in action", GetModel: func(m *views.MainMenuModel) tea.Model {
+			return views.NewCodeModel(m.List.Height(), m.List.Width())
+		}},
 	}
 
 	//pods, err := clientset.CoreV1().Pods("").List(context.TODO(), metav1.ListOptions{})

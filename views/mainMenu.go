@@ -16,9 +16,12 @@ func updateChoices(msg tea.Msg, m MainMenuModel) (tea.Model, tea.Cmd) {
 		switch msg.String() {
 		case "enter":
 			if i, ok := m.List.SelectedItem().(MainMenuItem); ok {
+				var cmds []tea.Cmd
 				m.Chosen = true
 				m.Choice = i.GetModel(&m)
-				return m, m.Choice.Init()
+				cmds = append(cmds, m.Choice.Init())
+				cmds = append(cmds, utils.WindowSizeCmd(m.Width, m.Height))
+				return m, tea.Batch(cmds...)
 				//fmt.Println(i.Title())
 			}
 		case "q":
@@ -26,6 +29,8 @@ func updateChoices(msg tea.Msg, m MainMenuModel) (tea.Model, tea.Cmd) {
 		}
 	case tea.WindowSizeMsg:
 		h, v := utils.AppStyle.GetFrameSize()
+		m.Width = msg.Width
+		m.Height = msg.Height
 		m.List.SetSize(msg.Width-h, msg.Height-v)
 	}
 
@@ -81,6 +86,8 @@ type MainMenuModel struct {
 	Choice      tea.Model
 	Chosen      bool
 	ViewHistory []*tea.Model
+	Width       int
+	Height      int
 }
 
 func (m MainMenuModel) Init() tea.Cmd {
