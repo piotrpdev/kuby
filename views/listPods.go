@@ -14,7 +14,6 @@ import (
 	"gopkg.in/yaml.v3"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/client-go/kubernetes"
 	"kuby/k8s"
 	"kuby/tables"
 	"kuby/utils"
@@ -80,17 +79,13 @@ func (m ListPodsModel) View() string {
 	return b.String()
 }
 
-func NewPodsTable(clientset *kubernetes.Clientset) (*table.Model, error) {
-	// TODO: Maybe move the api call somewhere else and add pods as param e.g. separate concerns
-	pods, err := clientset.CoreV1().Pods("").List(context.TODO(), metav1.ListOptions{})
-	if err != nil {
-		return nil, err
-	}
-
-	rows := lop.Map(pods.Items, func(item v1.Pod, index int) table.Row {
+func PodListToRows(pods *v1.PodList) []table.Row {
+	return lop.Map(pods.Items, func(item v1.Pod, index int) table.Row {
 		return table.Row{strconv.Itoa(index), item.ObjectMeta.Name, item.ObjectMeta.Namespace, string(item.Status.Phase), item.Status.PodIP, item.Status.HostIP}
 	})
+}
 
+func NewPodsTable(rows []table.Row) *table.Model {
 	columns := []table.Column{
 		{Title: "Index", Width: 5},
 		{Title: "Name", Width: tables.LongestInColumn(&rows, 1)},
@@ -121,5 +116,5 @@ func NewPodsTable(clientset *kubernetes.Clientset) (*table.Model, error) {
 		Bold(false)
 	t.SetStyles(s)
 
-	return &t, err
+	return &t
 }
